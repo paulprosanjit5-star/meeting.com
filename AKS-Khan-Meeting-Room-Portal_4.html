@@ -1,0 +1,1451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Meeting Room Booking &mdash; A K S Khan Healthcare Ltd.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#12213C;
+    --navy-deep:#0A1428;
+    --navy-soft:#1C3055;
+    --teal:#2C87A6;
+    --teal-light:#5BAFC7;
+    --teal-pale:#E4F1F4;
+    --green:#3FA575;
+    --green-pale:#E4F6ED;
+    --amber:#DE9F3B;
+    --amber-pale:#FBF0DD;
+    --coral:#D3594B;
+    --coral-pale:#FAE7E4;
+    --grey-blue:#8E9FB5;
+    --grey-pale:#EDEFF2;
+    --slate:#57667A;
+    --bg:#F3F6F7;
+    --card:#FFFFFF;
+    --border:#E1E7EA;
+    --font-display:'Fraunces', serif;
+    --font-body:'Inter', sans-serif;
+    --font-mono:'JetBrains Mono', monospace;
+    --radius:12px;
+    --shadow: 0 1px 2px rgba(18,33,60,0.04), 0 8px 24px -12px rgba(18,33,60,0.12);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;height:100%;}
+  body{
+    font-family:var(--font-body);
+    background:var(--bg);
+    color:var(--navy);
+    -webkit-font-smoothing:antialiased;
+    font-size:14px;
+  }
+  ::selection{background:var(--teal-pale);}
+  button{font-family:inherit;cursor:pointer;}
+  input,select,textarea{font-family:inherit;font-size:14px;}
+  a{color:inherit;}
+  h1,h2,h3,h4{font-family:var(--font-display);margin:0;letter-spacing:-0.01em;}
+  .mono{font-family:var(--font-mono);}
+  #app{min-height:100vh;}
+
+  /* ---------- Scrollbar ---------- */
+  ::-webkit-scrollbar{width:8px;height:8px;}
+  ::-webkit-scrollbar-thumb{background:#c6d0d8;border-radius:8px;}
+  ::-webkit-scrollbar-track{background:transparent;}
+
+  /* ---------- Login ---------- */
+  .login-wrap{
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:
+      radial-gradient(circle at 15% 20%, rgba(44,135,166,0.16), transparent 45%),
+      radial-gradient(circle at 85% 80%, rgba(63,165,117,0.14), transparent 45%),
+      var(--navy-deep);
+    padding:24px;
+  }
+  .login-card{
+    width:100%;max-width:960px;
+    background:var(--card);
+    border-radius:20px;
+    overflow:hidden;
+    display:grid;
+    grid-template-columns:1.1fr 1fr;
+    box-shadow:0 30px 80px -20px rgba(0,0,0,0.5);
+  }
+  .login-side{
+    background:linear-gradient(165deg, var(--navy) 0%, var(--navy-soft) 55%, var(--teal) 130%);
+    color:#fff;
+    padding:48px 40px;
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+    position:relative;
+    overflow:hidden;
+  }
+  .login-side::after{
+    content:"";position:absolute;right:-60px;bottom:-60px;width:220px;height:220px;
+    border-radius:50%;border:1px solid rgba(255,255,255,0.15);
+  }
+  .login-side::before{
+    content:"";position:absolute;right:20px;bottom:-100px;width:180px;height:180px;
+    border-radius:50%;border:1px solid rgba(255,255,255,0.1);
+  }
+  .login-logo-box{background:#fff;display:inline-flex;padding:10px 16px;border-radius:10px;width:fit-content;}
+  .login-logo-box img{height:52px;display:block;}
+  .login-side h1{font-size:30px;font-weight:600;line-height:1.25;margin-top:32px;color:#fff;}
+  .login-side p{color:rgba(255,255,255,0.72);font-size:14px;line-height:1.6;max-width:340px;margin-top:12px;}
+  .login-stats{display:flex;gap:24px;margin-top:36px;position:relative;z-index:1;}
+  .login-stats div b{display:block;font-family:var(--font-display);font-size:22px;}
+  .login-stats div span{font-size:11px;color:rgba(255,255,255,0.6);text-transform:uppercase;letter-spacing:0.06em;}
+  .login-form{padding:48px 44px;display:flex;flex-direction:column;justify-content:center;}
+  .login-form .eyebrow{font-size:11px;text-transform:uppercase;letter-spacing:0.12em;color:var(--teal);font-weight:700;margin-bottom:6px;}
+  .login-form h2{font-size:24px;margin-bottom:4px;}
+  .login-form .sub{color:var(--slate);font-size:13px;margin-bottom:26px;}
+  .role-tabs{display:flex;gap:8px;margin-bottom:22px;background:var(--grey-pale);padding:4px;border-radius:10px;}
+  .role-tab{flex:1;text-align:center;padding:9px 6px;border-radius:8px;border:none;background:transparent;font-weight:600;font-size:12.5px;color:var(--slate);transition:.15s;}
+  .role-tab.active{background:#fff;color:var(--navy);box-shadow:var(--shadow);}
+  .field{margin-bottom:16px;}
+  .field label{display:block;font-size:12px;font-weight:600;color:var(--slate);margin-bottom:6px;}
+  .field input, .field select{
+    width:100%;padding:11px 13px;border:1.5px solid var(--border);border-radius:9px;
+    outline:none;transition:.15s;background:#fbfcfd;
+  }
+  .field input:focus, .field select:focus{border-color:var(--teal);background:#fff;}
+  .hint{font-size:11.5px;color:var(--grey-blue);margin-top:6px;}
+  .btn{
+    border:none;border-radius:9px;padding:12px 18px;font-weight:700;font-size:13.5px;
+    display:inline-flex;align-items:center;justify-content:center;gap:8px;transition:.15s;
+  }
+  .btn-primary{background:var(--navy);color:#fff;}
+  .btn-primary:hover{background:var(--navy-soft);}
+  .btn-teal{background:var(--teal);color:#fff;}
+  .btn-teal:hover{background:#256f89;}
+  .btn-block{width:100%;}
+  .btn-ghost{background:transparent;color:var(--slate);border:1.5px solid var(--border);}
+  .btn-ghost:hover{border-color:var(--teal);color:var(--teal);}
+  .btn-danger{background:var(--coral-pale);color:var(--coral);}
+  .btn-danger:hover{background:var(--coral);color:#fff;}
+  .btn-green{background:var(--green-pale);color:var(--green);}
+  .btn-green:hover{background:var(--green);color:#fff;}
+  .btn svg{width:14px;height:14px;flex-shrink:0;}
+  .btn-sm{padding:7px 12px;font-size:12px;border-radius:7px;}
+  .login-error{background:var(--coral-pale);color:var(--coral);padding:10px 12px;border-radius:8px;font-size:12.5px;margin-bottom:14px;font-weight:600;display:none;}
+  .demo-note{margin-top:18px;font-size:11.5px;color:var(--grey-blue);line-height:1.6;border-top:1px dashed var(--border);padding-top:14px;}
+  .demo-note b{color:var(--slate);}
+
+  /* ---------- Shell ---------- */
+  .shell{display:flex;min-height:100vh;}
+  .sidebar{
+    width:246px;flex-shrink:0;background:var(--navy-deep);color:#fff;
+    display:flex;flex-direction:column;position:sticky;top:0;height:100vh;
+  }
+  .sidebar-logo{padding:22px 20px 18px;}
+  .sidebar-logo-box{background:#fff;border-radius:9px;padding:8px 12px;display:inline-flex;}
+  .sidebar-logo-box img{height:36px;display:block;}
+  .sidebar-role{padding:0 20px 16px;}
+  .role-pill{
+    display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,0.08);
+    padding:5px 10px;border-radius:20px;font-size:11px;font-weight:700;color:var(--teal-light);
+    text-transform:uppercase;letter-spacing:0.05em;
+  }
+  .role-pill svg{width:12px;height:12px;}
+  .alt-room-chip svg{width:12px;height:12px;}
+  .notif-ic svg{width:14px;height:14px;}
+  .nav{flex:1;padding:6px 12px;overflow-y:auto;}
+  .nav-group-label{font-size:10.5px;text-transform:uppercase;letter-spacing:0.09em;color:rgba(255,255,255,0.35);padding:14px 10px 6px;font-weight:700;}
+  .nav-item{
+    display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:9px;color:rgba(255,255,255,0.72);
+    font-size:13.5px;font-weight:600;margin-bottom:2px;border:none;background:transparent;width:100%;text-align:left;
+    transition:.12s;
+  }
+  .nav-item svg{width:17px;height:17px;flex-shrink:0;opacity:0.85;}
+  .nav-item:hover{background:rgba(255,255,255,0.06);color:#fff;}
+  .nav-item.active{background:var(--teal);color:#fff;}
+  .nav-item.active svg{opacity:1;}
+  .nav-badge{margin-left:auto;background:var(--amber);color:#2a1c04;font-size:10.5px;font-weight:800;padding:1px 7px;border-radius:20px;}
+  .sidebar-foot{padding:14px;border-top:1px solid rgba(255,255,255,0.08);}
+  .user-chip{display:flex;align-items:center;gap:10px;padding:8px;border-radius:10px;}
+  .user-avatar{width:34px;height:34px;border-radius:9px;background:var(--teal);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0;}
+  .user-meta{overflow:hidden;}
+  .user-meta b{display:block;font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .user-meta span{font-size:11px;color:rgba(255,255,255,0.5);}
+  .logout-btn{width:100%;margin-top:10px;background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.75);border:none;border-radius:9px;padding:9px;font-size:12.5px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:7px;}
+  .logout-btn:hover{background:rgba(255,255,255,0.12);color:#fff;}
+
+  .main{flex:1;min-width:0;display:flex;flex-direction:column;}
+  .topbar{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:18px 30px;background:#fff;border-bottom:1px solid var(--border);
+    position:sticky;top:0;z-index:20;
+  }
+  .topbar h2{font-size:20px;}
+  .topbar .date{font-size:12.5px;color:var(--slate);margin-top:2px;}
+  .topbar-actions{display:flex;align-items:center;gap:14px;}
+  .bell-btn{position:relative;width:38px;height:38px;border-radius:10px;border:1.5px solid var(--border);background:#fff;display:flex;align-items:center;justify-content:center;}
+  .bell-btn svg{width:17px;height:17px;color:var(--slate);}
+  .bell-dot{position:absolute;top:6px;right:7px;width:8px;height:8px;border-radius:50%;background:var(--coral);border:2px solid #fff;}
+  .content{padding:28px 30px 60px;flex:1;}
+
+  /* ---------- Cards / generic ---------- */
+  .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);}
+  .section-title{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+  .section-title h3{font-size:17px;}
+  .section-title .eyebrow{font-size:10.5px;text-transform:uppercase;letter-spacing:0.09em;color:var(--teal);font-weight:800;margin-bottom:3px;}
+  .grid{display:grid;gap:16px;}
+  .grid-4{grid-template-columns:repeat(4,1fr);}
+  .grid-3{grid-template-columns:repeat(3,1fr);}
+  .grid-2{grid-template-columns:repeat(2,1fr);}
+  @media(max-width:1100px){.grid-4{grid-template-columns:repeat(2,1fr);} .grid-3{grid-template-columns:repeat(2,1fr);}}
+
+  /* home hero buttons */
+  .hero-banner{
+    background:linear-gradient(120deg, var(--navy) 0%, var(--navy-soft) 60%, var(--teal) 140%);
+    border-radius:18px;color:#fff;padding:34px 34px;margin-bottom:26px;position:relative;overflow:hidden;
+  }
+  .hero-banner::after{content:"";position:absolute;right:-40px;top:-60px;width:200px;height:200px;border-radius:50%;border:1px solid rgba(255,255,255,0.14);}
+  .hero-banner h1{font-size:26px;font-weight:600;position:relative;z-index:1;}
+  .hero-banner p{color:rgba(255,255,255,0.72);font-size:13.5px;margin-top:6px;max-width:480px;position:relative;z-index:1;}
+
+  .action-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;}
+  @media(max-width:1100px){.action-grid{grid-template-columns:repeat(2,1fr);}}
+  .action-tile{
+    background:#fff;border:1px solid var(--border);border-radius:14px;padding:22px 18px;text-align:left;
+    display:flex;flex-direction:column;gap:14px;transition:.15s;
+  }
+  .action-tile:hover{border-color:var(--teal);transform:translateY(-2px);box-shadow:var(--shadow);}
+  .action-tile .ic{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;}
+  .action-tile .ic svg{width:20px;height:20px;}
+  .action-tile b{font-size:14.5px;font-family:var(--font-display);font-weight:600;}
+  .action-tile span{font-size:12px;color:var(--slate);}
+
+  .stat-card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:18px 20px;}
+  .stat-card .eyebrow{font-size:10.5px;text-transform:uppercase;letter-spacing:0.08em;color:var(--slate);font-weight:700;}
+  .stat-card b{display:block;font-family:var(--font-display);font-size:30px;margin-top:6px;}
+  .stat-card .delta{font-size:11.5px;margin-top:4px;font-weight:600;}
+
+  /* status pill */
+  .status{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:700;padding:4px 10px;border-radius:20px;white-space:nowrap;}
+  .status-Pending{background:var(--amber-pale);color:#96690F;}
+  .status-Approved{background:var(--green-pale);color:#1E7A50;}
+  .status-Rejected{background:var(--coral-pale);color:#A93A2E;}
+  .status-Cancelled{background:var(--grey-pale);color:var(--slate);}
+  .status-Completed{background:var(--teal-pale);color:#1D6A82;}
+  .dot{width:7px;height:7px;border-radius:50%;display:inline-block;}
+  .dot-Pending{background:#DE9F3B;} .dot-Approved{background:#3FA575;} .dot-Rejected{background:#D3594B;}
+  .dot-Cancelled{background:#8E9FB5;} .dot-Completed{background:#2C87A6;} .dot-avail{background:#3FA575;} .dot-busy{background:#D3594B;}
+
+  /* forms */
+  .form-card{padding:24px;}
+  .form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+  .form-row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;}
+  @media(max-width:800px){.form-row,.form-row-3{grid-template-columns:1fr;}}
+  .toggle-row{display:flex;gap:10px;}
+  .toggle-btn{flex:1;padding:9px;border-radius:8px;border:1.5px solid var(--border);background:#fbfcfd;font-weight:700;font-size:12.5px;color:var(--slate);}
+  .toggle-btn.on{border-color:var(--teal);background:var(--teal-pale);color:var(--teal);}
+
+  /* room cards for availability */
+  .room-avail-card{border:1.5px solid var(--border);border-radius:13px;padding:16px;display:flex;flex-direction:column;gap:10px;background:#fff;}
+  .room-avail-card.avail{border-color:#bfe3d0;}
+  .room-avail-card.busy{border-color:#f0cec8;background:#FDFAF9;}
+  .room-avail-card .rname{font-family:var(--font-display);font-size:15.5px;font-weight:600;}
+  .room-avail-card .rloc{font-size:11.5px;color:var(--slate);}
+  .room-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:2px;}
+  .room-tag{font-size:10.5px;background:var(--grey-pale);color:var(--slate);padding:3px 8px;border-radius:6px;font-weight:600;}
+
+  table{width:100%;border-collapse:collapse;font-size:13px;}
+  th{text-align:left;font-size:10.5px;text-transform:uppercase;letter-spacing:0.06em;color:var(--slate);padding:10px 14px;border-bottom:1.5px solid var(--border);font-weight:700;}
+  td{padding:12px 14px;border-bottom:1px solid var(--border);vertical-align:middle;}
+  tr:last-child td{border-bottom:none;}
+  .empty-state{padding:50px 20px;text-align:center;color:var(--slate);}
+  .empty-state svg{width:38px;height:38px;color:var(--grey-blue);margin-bottom:10px;}
+  .empty-state b{display:block;color:var(--navy);font-family:var(--font-display);font-size:15px;margin-bottom:4px;}
+  .empty-state span{font-size:12.5px;}
+
+  .tabs{display:flex;gap:4px;background:var(--grey-pale);padding:4px;border-radius:10px;width:fit-content;margin-bottom:18px;}
+  .tab-btn{padding:8px 16px;border-radius:8px;border:none;background:transparent;font-size:12.5px;font-weight:700;color:var(--slate);}
+  .tab-btn.active{background:#fff;color:var(--navy);box-shadow:var(--shadow);}
+
+  /* calendar strip */
+  .cal-wrap{overflow-x:auto;}
+  .cal-grid{min-width:920px;}
+  .cal-axis{display:grid;grid-template-columns:170px 1fr;border-bottom:1.5px solid var(--border);padding-bottom:8px;margin-bottom:6px;}
+  .cal-axis-hours{display:grid;grid-template-columns:repeat(12,1fr);}
+  .cal-axis-hours span{font-size:10.5px;color:var(--slate);font-weight:700;}
+  .cal-row{display:grid;grid-template-columns:170px 1fr;align-items:center;padding:9px 0;border-bottom:1px solid #F0F3F4;}
+  .cal-room-label b{font-size:12.5px;display:block;}
+  .cal-room-label span{font-size:10.5px;color:var(--slate);}
+  .cal-track{position:relative;height:26px;background:repeating-linear-gradient(to right, #F5F7F8 0, #F5F7F8 calc(100%/12 - 1px), #EAEDEF calc(100%/12 - 1px), #EAEDEF calc(100%/12));border-radius:6px;}
+  .cal-block{position:absolute;top:2px;bottom:2px;border-radius:5px;font-size:10px;color:#fff;font-weight:700;display:flex;align-items:center;padding:0 8px;overflow:hidden;white-space:nowrap;}
+
+  /* modal */
+  .modal-overlay{position:fixed;inset:0;background:rgba(10,20,40,0.5);display:flex;align-items:center;justify-content:center;z-index:100;padding:20px;backdrop-filter:blur(2px);}
+  .modal{background:#fff;border-radius:16px;max-width:640px;width:100%;max-height:88vh;overflow-y:auto;box-shadow:0 30px 80px -20px rgba(0,0,0,0.4);}
+  .modal-head{display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:1px solid var(--border);position:sticky;top:0;background:#fff;z-index:2;}
+  .modal-head h3{font-size:17px;}
+  .modal-close{width:30px;height:30px;border-radius:8px;border:none;background:var(--grey-pale);display:flex;align-items:center;justify-content:center;}
+  .modal-body{padding:22px 24px;}
+  .modal-foot{padding:16px 24px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:10px;position:sticky;bottom:0;background:#fff;}
+  .alert{padding:11px 14px;border-radius:9px;font-size:12.5px;font-weight:600;margin-bottom:16px;display:flex;gap:9px;align-items:flex-start;}
+  .alert svg{width:15px;height:15px;flex-shrink:0;margin-top:1px;}
+  .alert-error{background:var(--coral-pale);color:#A93A2E;}
+  .alert-info{background:var(--teal-pale);color:#1D6A82;}
+  .alert-success{background:var(--green-pale);color:#1E7A50;}
+  .alt-room-chip{display:inline-flex;align-items:center;gap:6px;background:#fff;border:1.5px solid var(--green);color:var(--green);font-weight:700;font-size:11.5px;padding:5px 10px;border-radius:20px;margin:4px 4px 0 0;}
+
+  /* toast */
+  .toast-stack{position:fixed;top:20px;right:20px;z-index:200;display:flex;flex-direction:column;gap:10px;}
+  .toast{background:var(--navy);color:#fff;padding:13px 16px;border-radius:11px;font-size:12.5px;font-weight:600;box-shadow:0 14px 34px -10px rgba(0,0,0,0.4);display:flex;align-items:center;gap:10px;min-width:260px;animation:slidein .25s ease;}
+  .toast svg{width:16px;height:16px;flex-shrink:0;}
+  @keyframes slidein{from{opacity:0;transform:translateX(20px);}to{opacity:1;transform:translateX(0);}}
+
+  .footnote{font-size:11.5px;color:var(--grey-blue);margin-top:26px;padding-top:16px;border-top:1px dashed var(--border);line-height:1.7;}
+  .rooms-manage-card{padding:18px;display:flex;flex-direction:column;gap:10px;}
+  .rooms-manage-top{display:flex;justify-content:space-between;align-items:flex-start;}
+  .bar-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+  .bar-row .lbl{width:150px;font-size:12px;font-weight:600;flex-shrink:0;}
+  .bar-track{flex:1;height:9px;background:var(--grey-pale);border-radius:6px;overflow:hidden;}
+  .bar-fill{height:100%;border-radius:6px;background:var(--teal);}
+  .bar-row .val{width:32px;text-align:right;font-size:12px;font-weight:700;color:var(--slate);}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div class="toast-stack" id="toastStack"></div>
+
+<script>
+/* ============================ ICONS ============================ */
+const ICON = {
+  home:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7"/><path d="M9 22V12h6v10"/><path d="M5 10v11h14V10"/></svg>',
+  book:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18"/><path d="M9 15l2 2 4-4"/></svg>',
+  avail:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18"/><path d="M8 2v4M16 2v4"/><circle cx="16" cy="16" r="1.5" fill="currentColor" stroke="none"/></svg>',
+  list:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h13M8 12h13M8 18h13"/><path d="M3 6h.01M3 12h.01M3 18h.01"/></svg>',
+  calendar:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg>',
+  dashboard:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>',
+  approve:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8.5 12.5l2.3 2.3L16 10"/></svg>',
+  door:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 21V4a1 1 0 0 1 1-1h9l4 4v14"/><path d="M5 21h14"/><circle cx="14" cy="12" r="1" fill="currentColor" stroke="none"/></svg>',
+  report:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><rect x="7" y="12" width="3" height="6"/><rect x="12.5" y="8" width="3" height="10"/><rect x="18" y="5" width="3" height="13"/></svg>',
+  users:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M2.5 20c1-3.6 3.5-5.4 6.5-5.4s5.5 1.8 6.5 5.4"/><circle cx="17.5" cy="8.5" r="2.6"/><path d="M15.8 14.8c2.6.3 4.6 2 5.5 5.2"/></svg>',
+  settings:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>',
+  logout:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>',
+  bell:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>',
+  x:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>',
+  alert:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg>',
+  check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>',
+  plus:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>',
+  clock:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg>',
+  edit:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>',
+  inbox:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.4 5h13.2L22 12v6a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-6z"/></svg>',
+};
+const LOGO_SRC = "data:image/png;base64,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";
+
+/* ============================ SEED DATA ============================ */
+let USERS = [
+  {id:'1205', name:'Farhana Chowdhury', dept:'Operations', role:'employee', email:'farhana.chowdhury@akskhan.com', mobile:'01711-223344'},
+  {id:'1310', name:'Rafiqul Islam', dept:'Finance', role:'employee', email:'rafiqul.islam@akskhan.com', mobile:'01822-556677'},
+  {id:'2026', name:'Nusrat Jahan', dept:'Administration', role:'admin', email:'nusrat.jahan@akskhan.com', mobile:'01933-889900'},
+  {id:'9000', name:'Imran Kabir', dept:'IT & Systems', role:'superadmin', email:'imran.kabir@akskhan.com', mobile:'01644-112233'},
+];
+
+let ROOMS = [
+  {id:'r1', name:'Board Room-01', floor:'6th Floor', capacity:20, projector:true, video:true, whiteboard:true, tea:true, status:'Active'},
+  {id:'r2', name:'Meeting Room-01', floor:'6th Floor', capacity:7, projector:true, video:false, whiteboard:true, tea:true, status:'Active'},
+  {id:'r3', name:'Meeting Room-02', floor:'6th Floor', capacity:4, projector:false, video:false, whiteboard:true, tea:false, status:'Active'},
+  {id:'r4', name:'Meeting Room-01', floor:'3rd Floor', capacity:14, projector:true, video:true, whiteboard:true, tea:true, status:'Active'},
+  {id:'r5', name:'Meeting Room-01', floor:'12th Floor', capacity:7, projector:true, video:false, whiteboard:false, tea:true, status:'Active'},
+];
+
+const TODAY = '2026-08-12';
+
+let BOOKINGS = [
+  {id:'BK-1001', roomId:'r2', empId:'1205', empName:'Farhana Chowdhury', empIdInput:'1205', deptInput:'Operations', date:'2026-08-12', start:'10:00', end:'11:00', participants:6, purpose:'Weekly Operations Sync', snacks:'No', snacksDetail:'', lunch:'No', lunchDetail:'', email:'farhana.chowdhury@akskhan.com', mobile:'01711-223344', status:'Approved', approvedBy:'2026', created:'2026-08-08', cancelReason:''},
+  {id:'BK-1002', roomId:'r3', empId:'1205', empName:'Farhana Chowdhury', empIdInput:'1205', deptInput:'Operations', date:'2026-08-14', start:'14:00', end:'15:30', participants:4, purpose:'Vendor Discussion', snacks:'Yes', snacksDetail:'Tea, biscuits for 4', lunch:'No', lunchDetail:'', email:'farhana.chowdhury@akskhan.com', mobile:'01711-223344', status:'Pending', approvedBy:'', created:'2026-08-10', cancelReason:''},
+  {id:'BK-1003', roomId:'r1', empId:'1310', empName:'Rafiqul Islam', empIdInput:'1310', deptInput:'Finance', date:'2026-08-12', start:'09:00', end:'10:00', participants:18, purpose:'Monthly Management Review', snacks:'Yes', snacksDetail:'Tea/coffee for 18', lunch:'No', lunchDetail:'', email:'rafiqul.islam@akskhan.com', mobile:'01822-556677', status:'Approved', approvedBy:'2026', created:'2026-08-05', cancelReason:''},
+  {id:'BK-1004', roomId:'r4', empId:'1205', empName:'Farhana Chowdhury', empIdInput:'1205', deptInput:'Operations', date:'2026-08-11', start:'11:00', end:'12:00', participants:12, purpose:'Client Onboarding Session', snacks:'Yes', snacksDetail:'Snacks for 12', lunch:'Yes', lunchDetail:'Lunch boxes x12', email:'farhana.chowdhury@akskhan.com', mobile:'01711-223344', status:'Completed', approvedBy:'2026', created:'2026-08-04', cancelReason:''},
+  {id:'BK-1005', roomId:'r2', empId:'1310', empName:'Rafiqul Islam', empIdInput:'1310', deptInput:'Finance', date:'2026-08-13', start:'15:00', end:'16:00', participants:5, purpose:'Interview Panel', snacks:'No', snacksDetail:'', lunch:'No', lunchDetail:'', email:'rafiqul.islam@akskhan.com', mobile:'01822-556677', status:'Cancelled', approvedBy:'', created:'2026-08-06', cancelReason:'Candidate rescheduled'},
+  {id:'BK-1006', roomId:'r1', empId:'1205', empName:'Farhana Chowdhury', empIdInput:'1205', deptInput:'Operations', date:'2026-08-12', start:'13:00', end:'14:00', participants:15, purpose:'Q3 Budget Walkthrough', snacks:'No', snacksDetail:'', lunch:'No', lunchDetail:'', email:'farhana.chowdhury@akskhan.com', mobile:'01711-223344', status:'Pending', approvedBy:'', created:'2026-08-11', cancelReason:''},
+];
+
+let NOTIFICATIONS = [
+  {id:'N1', userId:'1205', text:'Your booking for Meeting Room-01 (6th Floor) on 12-Aug-2026 was approved.', type:'success', time:'2 days ago'},
+  {id:'N2', userId:'1205', text:'Reminder: meeting in Board Room-01 tomorrow at 09:00.', type:'info', time:'1 day ago'},
+  {id:'N3', userId:'2026', text:'New booking request from Farhana Chowdhury is awaiting approval.', type:'info', time:'1 hour ago'},
+];
+
+let bookingSeq = 1007;
+let notifSeq = 4;
+
+/* ============================ SHARED LIVE SYNC ============================
+   Uses the artifact's persistent shared storage (window.storage) so every
+   person who opens this portal sees the same rooms/bookings/users/notifications.
+   This ONLY works when the file is opened inside Claude (the artifact host
+   injects window.storage). If opened as a plain downloaded HTML file in a
+   normal browser, window.storage does not exist and the app falls back to
+   local-only demo data (same as before) — a banner tells the user this. */
+const STORAGE_KEY = 'aks-khan-meeting-room-state-v1';
+const STORAGE_AVAILABLE = (typeof window !== 'undefined' && !!window.storage && typeof window.storage.get === 'function');
+let lastSyncedAt = null;
+
+function snapshotState(){
+  return { ROOMS, BOOKINGS, USERS, NOTIFICATIONS, bookingSeq, notifSeq };
+}
+function applySnapshot(s){
+  if(!s) return;
+  if(Array.isArray(s.ROOMS)) ROOMS = s.ROOMS;
+  if(Array.isArray(s.BOOKINGS)) BOOKINGS = s.BOOKINGS;
+  if(Array.isArray(s.USERS)) USERS = s.USERS;
+  if(Array.isArray(s.NOTIFICATIONS)) NOTIFICATIONS = s.NOTIFICATIONS;
+  if(typeof s.bookingSeq === 'number') bookingSeq = s.bookingSeq;
+  if(typeof s.notifSeq === 'number') notifSeq = s.notifSeq;
+}
+async function loadSharedState(){
+  if(!STORAGE_AVAILABLE) return false;
+  try{
+    const res = await window.storage.get(STORAGE_KEY, true);
+    if(res && res.value){
+      applySnapshot(JSON.parse(res.value));
+      lastSyncedAt = Date.now();
+      return true;
+    }
+    return false;
+  }catch(err){
+    // Key doesn't exist yet (first ever run) — seed it so everyone starts from the same data.
+    try{
+      await window.storage.set(STORAGE_KEY, JSON.stringify(snapshotState()), true);
+      lastSyncedAt = Date.now();
+    }catch(e2){ console.error('Could not seed shared storage', e2); }
+    return false;
+  }
+}
+async function saveSharedState(){
+  if(!STORAGE_AVAILABLE) return;
+  try{
+    await window.storage.set(STORAGE_KEY, JSON.stringify(snapshotState()), true);
+    lastSyncedAt = Date.now();
+  }catch(err){
+    console.error('Sync failed', err);
+    pushToast('Could not sync to shared storage — your change is saved locally only.','error');
+  }
+}
+// Light polling so everyone's screen picks up other people's bookings/approvals.
+function startLiveSync(){
+  if(!STORAGE_AVAILABLE) return;
+  setInterval(async ()=>{
+    if(!state.currentUser || state.modal) return; // don't yank a form out from under someone
+    const before = JSON.stringify(snapshotState());
+    await loadSharedState();
+    const after = JSON.stringify(snapshotState());
+    if(before !== after) renderApp();
+  }, 8000);
+}
+
+const HOURS = Array.from({length:12}, (_,i)=>8+i); // 08..19 -> displayed 08:00-20:00
+const TIME_OPTIONS = Array.from({length:13}, (_,i)=>{
+  const h = 8+i; return String(h).padStart(2,'0')+':00';
+});
+
+/* ============================ STATE ============================ */
+const state = {
+  currentUser: null,
+  loginRole: 'employee',
+  view: 'home',
+  bookingsTab: 'Pending',
+  reportsTab: 'department',
+  bookingDraft: null,       // {date,start,end,participants} for booking flow
+  editingBookingId: null,   // when rescheduling
+  modal: null,              // string key for open modal
+  modalRoomForBooking: null,
+  calDate: TODAY,
+  availDate: TODAY, availStart:'10:00', availEnd:'11:00', availPeople:1,
+};
+
+/* ============================ HELPERS ============================ */
+function fmtDate(d){
+  const dt = new Date(d+'T00:00:00');
+  return dt.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
+}
+function userById(id){ return USERS.find(u=>u.id===id); }
+function roomById(id){ return ROOMS.find(r=>r.id===id); }
+function toMin(t){ const [h,m]=t.split(':').map(Number); return h*60+m; }
+function overlaps(aS,aE,bS,bE){ return toMin(aS) < toMin(bE) && toMin(bS) < toMin(aE); }
+function activeBookingsFor(roomId, date, excludeId){
+  return BOOKINGS.filter(b => b.roomId===roomId && b.date===date && (b.status==='Pending'||b.status==='Approved') && b.id!==excludeId);
+}
+function isRoomFree(roomId, date, start, end, excludeId){
+  return !activeBookingsFor(roomId,date,excludeId).some(b=>overlaps(start,end,b.start,b.end));
+}
+function availableRoomsFor(date,start,end,minCap,excludeId){
+  return ROOMS.filter(r=>r.status==='Active' && r.capacity>=minCap && isRoomFree(r.id,date,start,end,excludeId));
+}
+function myBookings(empId){ return BOOKINGS.filter(b=>b.empId===empId).sort((a,b)=> (a.date+a.start) < (b.date+b.start) ? 1 : -1); }
+function pushToast(text, kind){
+  const stack = document.getElementById('toastStack');
+  const el = document.createElement('div');
+  el.className='toast';
+  const icon = kind==='error' ? ICON.alert : (kind==='success' ? ICON.check : ICON.bell);
+  el.innerHTML = icon + '<span>'+text+'</span>';
+  stack.appendChild(el);
+  setTimeout(()=>{ el.style.opacity='0'; el.style.transition='opacity .3s'; setTimeout(()=>el.remove(),300); }, 3400);
+}
+function addNotification(userId, text, type){
+  notifSeq++;
+  NOTIFICATIONS.unshift({id:'N'+notifSeq, userId, text, type, time:'just now'});
+}
+function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+
+/* ============================ RENDER: LOGIN ============================ */
+function renderLogin(){
+  const app = document.getElementById('app');
+  app.innerHTML = `
+  <div class="login-wrap">
+    <div class="login-card">
+      <div class="login-side">
+        <div>
+          <div class="login-logo-box"><img src="${LOGO_SRC}" alt="A K S Khan Healthcare Ltd."/></div>
+          <h1>Meeting Room<br/>Booking Portal</h1>
+          <p>One shared calendar for every room across A K S Khan Healthcare Ltd. Check availability, request a room and get notified the moment it's approved &mdash; no more double-booked meetings.</p>
+        </div>
+        <div class="login-stats">
+          <div><b>${ROOMS.length}</b><span>Rooms Online</span></div>
+          <div><b>${BOOKINGS.filter(b=>b.status==='Approved'&&b.date===TODAY).length}</b><span>Today&rsquo;s Meetings</span></div>
+          <div><b>${BOOKINGS.filter(b=>b.status==='Pending').length}</b><span>Awaiting Approval</span></div>
+        </div>
+      </div>
+      <div class="login-form">
+        <div class="eyebrow">Sign in</div>
+        <h2>Welcome back</h2>
+        <div class="sub">Choose your access level to continue.</div>
+        <div class="role-tabs">
+          <button class="role-tab ${state.loginRole==='employee'?'active':''}" onclick="setLoginRole('employee')">Employee</button>
+          <button class="role-tab ${state.loginRole==='admin'?'active':''}" onclick="setLoginRole('admin')">Admin</button>
+          <button class="role-tab ${state.loginRole==='superadmin'?'active':''}" onclick="setLoginRole('superadmin')">Super Admin</button>
+        </div>
+        <div class="login-error" id="loginError">${state.loginRole==='employee'?'Employee ID not found. Please check the ID and try again.':'ID or access level not recognised.'}</div>
+        <div class="field">
+          <label>${state.loginRole==='employee'?'Employee ID':(state.loginRole==='superadmin'?'Super Admin ID':'Admin ID')}</label>
+          <input id="loginId" placeholder="${state.loginRole==='employee'?'e.g. 1205':(state.loginRole==='superadmin'?'Enter your Super Admin ID':'Enter your Admin ID')}" value="${state.loginRole==='employee'?'1205':''}"/>
+        </div>
+        <button class="btn btn-teal btn-block" onclick="doLogin()">Sign in &rarr;</button>
+        ${state.loginRole==='employee' ? `
+        <div class="demo-note">
+          <b>Demo access &mdash;</b> Employee ID <b>1205</b>. This is a working prototype: data lives only in this browser tab and resets on reload.
+        </div>` : `
+        <div class="demo-note">
+          Admin and Super Admin credentials are issued directly and are not shown here. Contact your system administrator if you need access.
+        </div>`}
+      </div>
+    </div>
+  </div>`;
+}
+function setLoginRole(r){ state.loginRole=r; renderLogin(); }
+function doLogin(){
+  const id = document.getElementById('loginId').value.trim();
+  const u = USERS.find(x=>x.id===id && x.role===state.loginRole);
+  if(!u){ document.getElementById('loginError').style.display='flex'; return; }
+  state.currentUser = u;
+  state.view = (u.role==='employee') ? 'home' : 'dashboard';
+  renderApp();
+}
+function doLogout(){
+  state.currentUser=null; state.view='home'; state.bookingDraft=null; state.editingBookingId=null;
+  renderLogin();
+}
+
+/* ============================ NAV CONFIG ============================ */
+function navFor(role){
+  if(role==='employee'){
+    return [
+      {group:'Workspace', items:[
+        {k:'home', label:'Home', icon:'home'},
+        {k:'availability', label:'Check Availability', icon:'avail'},
+        {k:'mybookings', label:'My Bookings', icon:'list', badge: myBookings(state.currentUser.id).filter(b=>b.status==='Pending').length},
+        {k:'calendar', label:'Calendar', icon:'calendar'},
+      ]}
+    ];
+  }
+  const items = [
+    {k:'dashboard', label:'Dashboard', icon:'dashboard'},
+    {k:'bookings', label:'Approvals & Bookings', icon:'approve', badge: BOOKINGS.filter(b=>b.status==='Pending').length},
+    {k:'rooms', label:'Room Management', icon:'door'},
+    {k:'calendar', label:'Calendar', icon:'calendar'},
+    {k:'reports', label:'Reports', icon:'report'},
+  ];
+  if(role==='superadmin'){
+    items.push({k:'users', label:'User & Admin Mgmt', icon:'users'});
+    items.push({k:'settings', label:'System Settings', icon:'settings'});
+  }
+  return [{group: role==='superadmin' ? 'Super Admin' : 'Admin', items}];
+}
+const VIEW_TITLES = {
+  home:'Welcome', book:'Book a Room', availability:'Check Availability', mybookings:'My Bookings', calendar:'Meeting Room Calendar',
+  dashboard:'Meeting Room Dashboard', bookings:'Approvals &amp; Bookings', rooms:'Room Management', reports:'Reports',
+  users:'User &amp; Admin Management', settings:'System Settings'
+};
+
+/* ============================ SHELL ============================ */
+function renderApp(){
+  const u = state.currentUser;
+  if(!u){ renderLogin(); return; }
+  const app = document.getElementById('app');
+  const groups = navFor(u.role);
+  const roleLabel = u.role==='employee'?'Employee':(u.role==='admin'?'Admin':'Super Admin');
+  app.innerHTML = `
+  <div class="shell">
+    <div class="sidebar">
+      <div class="sidebar-logo"><div class="sidebar-logo-box"><img src="${LOGO_SRC}" alt="Logo"/></div></div>
+      <div class="sidebar-role"><span class="role-pill">${ICON.settings}${roleLabel} &middot; ID ${u.id}</span></div>
+      <div class="nav">
+        ${groups.map(g=>`
+          <div class="nav-group-label">${g.group}</div>
+          ${g.items.map(it=>`
+            <button class="nav-item ${state.view===it.k?'active':''}" onclick="goView('${it.k}')">
+              ${ICON[it.icon]}<span>${it.label}</span>
+              ${it.badge?`<span class="nav-badge">${it.badge}</span>`:''}
+            </button>`).join('')}
+        `).join('')}
+      </div>
+      <div class="sidebar-foot">
+        <button class="logout-btn" onclick="doLogout()">${ICON.logout} Sign out</button>
+      </div>
+    </div>
+    <div class="main">
+      <div class="topbar">
+        <div>
+          <h2>${VIEW_TITLES[state.view]||''}</h2>
+          <div class="date">${new Date().toLocaleDateString('en-GB',{weekday:'long', day:'2-digit', month:'long', year:'numeric'})}</div>
+        </div>
+        <div class="topbar-actions">
+          <span style="display:flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:${STORAGE_AVAILABLE?'var(--green)':'var(--grey-blue)'};">
+            <span class="dot" style="background:${STORAGE_AVAILABLE?'var(--green)':'var(--grey-blue)'};"></span>${STORAGE_AVAILABLE?'Live &middot; shared with everyone':'Local only'}
+          </span>
+          <button class="bell-btn" onclick="openModal('notifications')">${ICON.bell}${myNotifs().length?'<span class="bell-dot"></span>':''}</button>
+        </div>
+      </div>
+      <div class="content" id="content"></div>
+    </div>
+  </div>`;
+  renderView();
+  renderModal();
+}
+function myNotifs(){ return NOTIFICATIONS.filter(n=>n.userId===state.currentUser.id); }
+function goView(v){ state.view=v; state.bookingDraft=null; state.editingBookingId=null; renderApp(); }
+
+/* ============================ VIEW ROUTER ============================ */
+function renderView(){
+  const c = document.getElementById('content');
+  const role = state.currentUser.role;
+  if(role==='employee'){
+    if(state.view==='home') return c.innerHTML = viewEmployeeHome();
+    if(state.view==='book') return c.innerHTML = viewBook();
+    if(state.view==='availability') return c.innerHTML = viewAvailability();
+    if(state.view==='mybookings') return c.innerHTML = viewMyBookings();
+    if(state.view==='calendar') return c.innerHTML = viewCalendar();
+  } else {
+    if(state.view==='dashboard') return c.innerHTML = viewDashboard();
+    if(state.view==='bookings') return c.innerHTML = viewAdminBookings();
+    if(state.view==='rooms') return c.innerHTML = viewRooms();
+    if(state.view==='calendar') return c.innerHTML = viewCalendar();
+    if(state.view==='reports') return c.innerHTML = viewReports();
+    if(state.view==='users') return c.innerHTML = viewUsers();
+    if(state.view==='settings') return c.innerHTML = viewSettings();
+  }
+  c.innerHTML = '<div class="empty-state">View not found.</div>';
+}
+
+/* ============================ EMPLOYEE: HOME ============================ */
+function viewEmployeeHome(){
+  const u = state.currentUser;
+  const mine = myBookings(u.id);
+  const upcoming = mine.filter(b=> (b.date > TODAY || (b.date===TODAY)) && (b.status==='Approved'||b.status==='Pending')).sort((a,b)=> (a.date+a.start) > (b.date+b.start) ? 1:-1).slice(0,3);
+  return `
+    <div class="hero-banner">
+      <h1>Welcome &#128075;</h1>
+      <p>Find a room, request a booking, and track approvals &mdash; all from one place.</p>
+    </div>
+    <div class="action-grid" style="margin-bottom:26px;grid-template-columns:repeat(3,1fr);">
+      <button class="action-tile" onclick="goView('availability')">
+        <div class="ic" style="background:var(--green-pale);color:var(--green);">${ICON.avail}</div>
+        <div><b>Check Availability</b><br><span>See which rooms are free &amp; book one</span></div>
+      </button>
+      <button class="action-tile" onclick="goView('mybookings')">
+        <div class="ic" style="background:var(--amber-pale);color:#96690F;">${ICON.list}</div>
+        <div><b>My Bookings</b><br><span>View, cancel or reschedule</span></div>
+      </button>
+      <button class="action-tile" onclick="goView('calendar')">
+        <div class="ic" style="background:var(--coral-pale);color:var(--coral);">${ICON.calendar}</div>
+        <div><b>Calendar</b><br><span>Daily room-by-room view</span></div>
+      </button>
+    </div>
+    <div class="section-title"><h3>Your upcoming meetings</h3><button class="btn btn-ghost btn-sm" onclick="goView('mybookings')">View all</button></div>
+    <div class="card">
+      ${upcoming.length ? `<table><thead><tr><th>Date</th><th>Time</th><th>Room</th><th>Purpose</th><th>Status</th></tr></thead><tbody>
+        ${upcoming.map(b=>{const r=roomById(b.roomId); return `<tr>
+          <td class="mono">${fmtDate(b.date)}</td><td class="mono">${b.start}&ndash;${b.end}</td>
+          <td>${r.name} <span style="color:var(--slate);font-size:11.5px;">(${r.floor})</span></td>
+          <td>${esc(b.purpose)}</td><td>${statusPill(b.status)}</td></tr>`;}).join('')}
+      </tbody></table>` : emptyState('inbox','Nothing scheduled yet','Book a room to see it appear here.')}
+    </div>
+  `;
+}
+function statusPill(s){
+  const dotIcon = {Pending:'&#128993;',Approved:'&#128994;',Rejected:'&#128308;',Cancelled:'&#9898;',Completed:'&#128309;'}[s]||'';
+  return `<span class="status status-${s}"><span class="dot dot-${s}"></span>${s}</span>`;
+}
+function emptyState(icon, title, sub){
+  return `<div class="empty-state">${ICON[icon]}<b>${title}</b><span>${sub}</span></div>`;
+}
+
+/* ============================ EMPLOYEE: BOOK FLOW ============================ */
+function viewBook(){
+  const d = state.bookingDraft || {date: TODAY, start:'10:00', end:'11:00', participants:2};
+  state.bookingDraft = d;
+  return `
+    <div class="section-title"><div><div class="eyebrow">Step 1 of 2</div><h3>When do you need the room?</h3></div></div>
+    <div class="card form-card" style="margin-bottom:22px;">
+      <div class="form-row-3">
+        <div class="field"><label>Meeting Date</label><input type="date" id="bDate" value="${d.date}" min="${TODAY}"/></div>
+        <div class="field"><label>Start Time</label><select id="bStart">${TIME_OPTIONS.map(t=>`<option ${t===d.start?'selected':''}>${t}</option>`).join('')}</select></div>
+        <div class="field"><label>End Time</label><select id="bEnd">${TIME_OPTIONS.map(t=>`<option ${t===d.end?'selected':''}>${t}</option>`).join('')}</select></div>
+      </div>
+      <div class="form-row">
+        <div class="field"><label>No. of Participants</label><input type="number" min="1" id="bPeople" value="${d.participants}"/></div>
+        <div class="field" style="display:flex;align-items:flex-end;"><button class="btn btn-teal btn-block" onclick="searchRooms()">${ICON.avail} Find available rooms</button></div>
+      </div>
+    </div>
+    <div id="bookRoomResults"></div>
+  `;
+}
+function searchRooms(){
+  const date = document.getElementById('bDate').value;
+  const start = document.getElementById('bStart').value;
+  const end = document.getElementById('bEnd').value;
+  const people = parseInt(document.getElementById('bPeople').value||'1',10);
+  const box = document.getElementById('bookRoomResults');
+  if(toMin(end) <= toMin(start)){
+    box.innerHTML = alertBox('error','End time must be after the start time.');
+    return;
+  }
+  state.bookingDraft = {date,start,end,participants:people};
+  const results = ROOMS.filter(r=>r.status==='Active').map(r=>{
+    const conflict = activeBookingsFor(r.id,date).find(b=>overlaps(start,end,b.start,b.end));
+    const free = !conflict && r.capacity>=people;
+    return {room:r, free, conflict, underCapacity: r.capacity<people};
+  });
+  box.innerHTML = `
+    <div class="section-title"><div><div class="eyebrow">Step 2 of 2</div><h3>Available rooms &middot; ${fmtDate(date)}, ${start}&ndash;${end}</h3></div></div>
+    <div class="grid grid-3">
+      ${results.map(x=>`
+        <div class="room-avail-card ${x.free?'avail':'busy'}">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+            <div><div class="rname">${x.room.name}</div><div class="rloc">${x.room.floor} &middot; Capacity ${x.room.capacity}</div></div>
+            <span class="status ${x.free?'status-Approved':'status-Rejected'}"><span class="dot ${x.free?'dot-avail':'dot-busy'}"></span>${x.free?'Available':(x.underCapacity?'Too small':'Booked')}</span>
+          </div>
+          <div class="room-tags">
+            ${x.room.projector?'<span class="room-tag">Projector</span>':''}
+            ${x.room.video?'<span class="room-tag">Video Conf</span>':''}
+            ${x.room.whiteboard?'<span class="room-tag">Whiteboard</span>':''}
+            ${x.room.tea?'<span class="room-tag">Tea/Coffee</span>':''}
+          </div>
+          ${x.conflict?`<div class="hint">Booked ${x.conflict.start}&ndash;${x.conflict.end}</div>`:''}
+          <button class="btn ${x.free?'btn-teal':'btn-ghost'} btn-sm" ${x.free?'':'disabled style="opacity:.45;cursor:not-allowed;"'} onclick="openBookingForm('${x.room.id}')">
+            ${x.free?'Select &amp; continue':'Unavailable'}
+          </button>
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+function alertBox(kind,msg){
+  return `<div class="alert alert-${kind}">${ICON.alert}<span>${msg}</span></div>`;
+}
+function openBookingForm(roomId){
+  state.modalRoomForBooking = roomId;
+  openModal('bookingForm');
+}
+
+/* ---- Booking form modal (also used for reschedule) ---- */
+function bookingFormModal(){
+  const editing = state.editingBookingId ? BOOKINGS.find(b=>b.id===state.editingBookingId) : null;
+  const d = editing ? {date:editing.date, start:editing.start, end:editing.end, participants:editing.participants} : state.bookingDraft;
+  const room = roomById(editing ? editing.roomId : state.modalRoomForBooking);
+  const u = state.currentUser;
+  const emp = editing ? userById(editing.empId) : u;
+  return `
+    <div class="modal-head"><h3>${editing?'Reschedule Booking':'Complete Your Booking'}</h3><button class="modal-close" onclick="closeModal()">${ICON.x}</button></div>
+    <div class="modal-body">
+      <div id="formAlert"></div>
+      <div class="card" style="padding:14px 16px;margin-bottom:18px;background:var(--teal-pale);border:none;display:flex;justify-content:space-between;align-items:center;">
+        <div><b style="font-family:var(--font-display);font-size:15px;">${room.name}</b><div style="font-size:12px;color:var(--slate);">${room.floor} &middot; Capacity ${room.capacity}</div></div>
+        ${!editing?`<button class="btn btn-ghost btn-sm" onclick="closeModal()">Change room</button>`:''}
+      </div>
+      <div class="form-row">
+        <div class="field"><label>Employee Name</label><input id="fEmpName" placeholder="Type your full name" value="${editing?esc(editing.empName||''):''}"/></div>
+        <div class="field"><label>Employee ID</label><input id="fEmpId" placeholder="Type your employee ID" value="${editing?esc(editing.empIdInput||''):''}"/></div>
+      </div>
+      <div class="form-row">
+        <div class="field"><label>Department</label><input id="fEmpDept" placeholder="Type your department" value="${editing?esc(editing.deptInput||''):''}"/></div>
+        <div class="field"><label>Meeting Room</label><input value="${room.name} (${room.floor})" disabled/></div>
+      </div>
+      <div class="form-row-3">
+        <div class="field"><label>Meeting Date</label><input type="date" id="fDate" value="${d.date}" min="${TODAY}"/></div>
+        <div class="field"><label>Start Time</label><select id="fStart">${TIME_OPTIONS.map(t=>`<option ${t===d.start?'selected':''}>${t}</option>`).join('')}</select></div>
+        <div class="field"><label>End Time</label><select id="fEnd">${TIME_OPTIONS.map(t=>`<option ${t===d.end?'selected':''}>${t}</option>`).join('')}</select></div>
+      </div>
+      <div class="form-row">
+        <div class="field"><label>No. of Participants</label><input type="number" min="1" id="fPeople" value="${editing?editing.participants:d.participants}"/></div>
+        <div class="field"><label>Meeting Purpose</label><input id="fPurpose" placeholder="e.g. Client review" value="${editing?esc(editing.purpose):''}"/></div>
+      </div>
+      <div class="form-row">
+        <div class="field">
+          <label>Snacks Required?</label>
+          <div class="toggle-row"><button type="button" class="toggle-btn ${((editing?editing.snacks:'No')==='Yes')?'on':''}" id="fSnacksYes" onclick="toggleYesNo('fSnacks',true)">Yes</button><button type="button" class="toggle-btn ${((editing?editing.snacks:'No')!=='Yes')?'on':''}" id="fSnacksNo" onclick="toggleYesNo('fSnacks',false)">No</button></div>
+        </div>
+        <div class="field"><label>Snacks Details</label><input id="fSnacksDetail" placeholder="Item details" value="${editing?esc(editing.snacksDetail):''}"/></div>
+      </div>
+      <div class="form-row">
+        <div class="field">
+          <label>Lunch Required?</label>
+          <div class="toggle-row"><button type="button" class="toggle-btn ${((editing?editing.lunch:'No')==='Yes')?'on':''}" id="fLunchYes" onclick="toggleYesNo('fLunch',true)">Yes</button><button type="button" class="toggle-btn ${((editing?editing.lunch:'No')!=='Yes')?'on':''}" id="fLunchNo" onclick="toggleYesNo('fLunch',false)">No</button></div>
+        </div>
+        <div class="field"><label>Lunch Details</label><input id="fLunchDetail" placeholder="Item details" value="${editing?esc(editing.lunchDetail):''}"/></div>
+      </div>
+      <div class="form-row">
+        <div class="field"><label>Official Mail Address</label><input id="fEmail" placeholder="Type your official email" value="${editing?esc(editing.email):''}"/></div>
+        <div class="field"><label>Official Mobile No.</label><input id="fMobile" placeholder="Type your official mobile no." value="${editing?esc(editing.mobile):''}"/></div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-teal" onclick="submitBooking('${editing?editing.id:''}', '${room.id}')">${editing?'Save changes':'Submit Booking'}</button>
+    </div>
+  `;
+}
+function toggleYesNo(prefix,isYes){
+  document.getElementById(prefix+'Yes').classList.toggle('on', isYes);
+  document.getElementById(prefix+'No').classList.toggle('on', !isYes);
+}
+function submitBooking(editId, roomId){
+  const empName = document.getElementById('fEmpName').value.trim();
+  const empIdInput = document.getElementById('fEmpId').value.trim();
+  const deptInput = document.getElementById('fEmpDept').value.trim();
+  const date = document.getElementById('fDate').value;
+  const start = document.getElementById('fStart').value;
+  const end = document.getElementById('fEnd').value;
+  const participants = parseInt(document.getElementById('fPeople').value||'1',10);
+  const purpose = document.getElementById('fPurpose').value.trim();
+  const snacks = document.getElementById('fSnacksYes').classList.contains('on') ? 'Yes':'No';
+  const snacksDetail = document.getElementById('fSnacksDetail').value.trim();
+  const lunch = document.getElementById('fLunchYes').classList.contains('on') ? 'Yes':'No';
+  const lunchDetail = document.getElementById('fLunchDetail').value.trim();
+  const email = document.getElementById('fEmail').value.trim();
+  const mobile = document.getElementById('fMobile').value.trim();
+  const alertBoxEl = document.getElementById('formAlert');
+
+  if(!empName || !empIdInput || !deptInput){ alertBoxEl.innerHTML=alertBox('error','Please fill in your name, employee ID and department.'); return; }
+  if(toMin(end)<=toMin(start)){ alertBoxEl.innerHTML=alertBox('error','End time must be after the start time.'); return; }
+  if(!purpose){ alertBoxEl.innerHTML=alertBox('error','Please enter the meeting purpose.'); return; }
+  if(!email || !mobile){ alertBoxEl.innerHTML=alertBox('error','Official mail address and mobile number are required.'); return; }
+
+  const room = roomById(roomId);
+  if(participants > room.capacity){ alertBoxEl.innerHTML=alertBox('error',`This room seats ${room.capacity}. Reduce participants or pick another room.`); return; }
+
+  if(!isRoomFree(roomId, date, start, end, editId||null)){
+    const conflict = activeBookingsFor(roomId,date,editId||null).find(b=>overlaps(start,end,b.start,b.end));
+    const alts = availableRoomsFor(date,start,end,participants, editId||null).filter(r=>r.id!==roomId);
+    alertBoxEl.innerHTML = `
+      <div class="alert alert-error">${ICON.alert}<span><b>This room is already booked for the selected time</b> (${conflict.start}&ndash;${conflict.end}). Booking was not submitted.</span></div>
+      ${alts.length? `<div style="margin-top:-6px;margin-bottom:16px;"><div class="hint" style="margin-bottom:6px;">Try one of these instead:</div>${alts.map(r=>`<span class="alt-room-chip" onclick="openBookingForm('${r.id}')">${ICON.check} ${r.name} (${r.floor})</span>`).join('')}</div>` : ''}
+    `;
+    return;
+  }
+
+  const u = state.currentUser;
+  if(editId){
+    const b = BOOKINGS.find(x=>x.id===editId);
+    Object.assign(b,{empName,empIdInput,deptInput,date,start,end,participants,purpose,snacks,snacksDetail,lunch,lunchDetail,email,mobile,status:'Pending',approvedBy:''});
+    pushToast('Booking rescheduled and resent for approval.','success');
+    USERS.filter(x=>x.role==='admin'||x.role==='superadmin').forEach(a=>addNotification(a.id, `${empName} rescheduled a booking for ${roomById(roomId).name}.`,'info'));
+  } else {
+    bookingSeq++;
+    const nb = {id:'BK-'+bookingSeq, roomId, empId:u.id, empName,empIdInput,deptInput, date,start,end,participants,purpose,snacks,snacksDetail,lunch,lunchDetail,email,mobile,status:'Pending',approvedBy:'',created:TODAY,cancelReason:''};
+    BOOKINGS.push(nb);
+    pushToast('Booking request submitted — pending approval.','success');
+    USERS.filter(x=>x.role==='admin'||x.role==='superadmin').forEach(a=>addNotification(a.id, `${empName} requested ${roomById(roomId).name} on ${fmtDate(date)}, ${start}\u2013${end}.`, 'info'));
+  }
+  state.editingBookingId=null; state.bookingDraft=null;
+  closeModal();
+  saveSharedState();
+  goView(editId ? 'mybookings' : 'mybookings');
+}
+
+/* ============================ EMPLOYEE: CHECK AVAILABILITY ============================ */
+function viewAvailability(){
+  const s = state;
+  return `
+    <div class="card form-card" style="margin-bottom:22px;">
+      <div class="form-row-3">
+        <div class="field"><label>Date</label><input type="date" id="aDate" value="${s.availDate}" min="${TODAY}"/></div>
+        <div class="field"><label>Start Time</label><select id="aStart">${TIME_OPTIONS.map(t=>`<option ${t===s.availStart?'selected':''}>${t}</option>`).join('')}</select></div>
+        <div class="field"><label>End Time</label><select id="aEnd">${TIME_OPTIONS.map(t=>`<option ${t===s.availEnd?'selected':''}>${t}</option>`).join('')}</select></div>
+      </div>
+      <div class="form-row">
+        <div class="field"><label>Participants</label><input type="number" min="1" id="aPeople" value="${s.availPeople}"/></div>
+        <div class="field" style="display:flex;align-items:flex-end;"><button class="btn btn-teal btn-block" onclick="runAvailability()">Check rooms</button></div>
+      </div>
+    </div>
+    <div id="availResults">${availabilityResultsHTML()}</div>
+  `;
+}
+function runAvailability(){
+  state.availDate = document.getElementById('aDate').value;
+  state.availStart = document.getElementById('aStart').value;
+  state.availEnd = document.getElementById('aEnd').value;
+  state.availPeople = parseInt(document.getElementById('aPeople').value||'1',10);
+  document.getElementById('availResults').innerHTML = availabilityResultsHTML();
+}
+function availabilityResultsHTML(){
+  const {availDate:date, availStart:start, availEnd:end, availPeople:people} = state;
+  if(toMin(end)<=toMin(start)) return alertBox('error','End time must be after the start time.');
+  const results = ROOMS.map(r=>{
+    const conflict = activeBookingsFor(r.id,date).find(b=>overlaps(start,end,b.start,b.end));
+    return {room:r, free: r.status==='Active' && !conflict, conflict};
+  });
+  return `
+    <div class="grid grid-3">
+      ${results.map(x=>`
+        <div class="room-avail-card ${x.free?'avail':'busy'}">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+            <div><div class="rname">${x.room.name}</div><div class="rloc">${x.room.floor} &middot; Capacity ${x.room.capacity}</div></div>
+            <span class="status ${x.free?'status-Approved':'status-Rejected'}"><span class="dot ${x.free?'dot-avail':'dot-busy'}"></span>${x.room.status!=='Active'?'Inactive':(x.free?'Available':'Booked')}</span>
+          </div>
+          ${x.conflict?`<div class="hint">Booked ${x.conflict.start}&ndash;${x.conflict.end}</div>`:''}
+          ${x.free?`<button class="btn btn-teal btn-sm" onclick="goBookFromAvailability('${x.room.id}')">Book this room</button>`:''}
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+function goBookFromAvailability(roomId){
+  state.bookingDraft = {date:state.availDate, start:state.availStart, end:state.availEnd, participants:state.availPeople};
+  openBookingForm(roomId);
+}
+
+/* ============================ EMPLOYEE: MY BOOKINGS ============================ */
+function viewMyBookings(){
+  const mine = myBookings(state.currentUser.id);
+  return `
+    <div class="card">
+      ${mine.length ? `<table><thead><tr><th>Date</th><th>Time</th><th>Room</th><th>Purpose</th><th>Status</th><th></th></tr></thead><tbody>
+        ${mine.map(b=>{
+          const r = roomById(b.roomId);
+          const canAct = b.status==='Pending' || b.status==='Approved';
+          return `<tr>
+            <td class="mono">${fmtDate(b.date)}</td>
+            <td class="mono">${b.start}&ndash;${b.end}</td>
+            <td>${r.name}<div style="font-size:11px;color:var(--slate);">${r.floor}</div></td>
+            <td>${esc(b.purpose)}</td>
+            <td>${statusPill(b.status)}${b.status==='Cancelled'&&b.cancelReason?`<div style="font-size:11px;color:var(--slate);margin-top:3px;">${esc(b.cancelReason)}</div>`:''}</td>
+            <td style="text-align:right;white-space:nowrap;">
+              <button class="btn btn-ghost btn-sm" onclick="viewBookingDetail('${b.id}')">View</button>
+              ${canAct?`<button class="btn btn-ghost btn-sm" onclick="startReschedule('${b.id}')">Reschedule</button>`:''}
+              ${canAct?`<button class="btn btn-danger btn-sm" onclick="cancelBooking('${b.id}')">Cancel</button>`:''}
+            </td>
+          </tr>`;
+        }).join('')}
+      </tbody></table>` : emptyState('list','No bookings yet','Head to “Check Availability” to reserve your first meeting room.')}
+    </div>
+  `;
+}
+function startReschedule(id){
+  state.editingBookingId = id;
+  openModal('bookingForm');
+}
+function cancelBooking(id){
+  const b = BOOKINGS.find(x=>x.id===id);
+  b.status='Cancelled'; b.cancelReason='Cancelled by employee';
+  pushToast('Booking cancelled. The room is available again.','success');
+  saveSharedState();
+  renderApp();
+}
+function viewBookingDetail(id){
+  state.detailBookingId = id;
+  openModal('bookingDetail');
+}
+function bookingDetailModal(){
+  const b = BOOKINGS.find(x=>x.id===state.detailBookingId);
+  const r = roomById(b.roomId);
+  const row=(k,v)=>`<div style="display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--border);font-size:13px;"><span style="color:var(--slate);">${k}</span><span style="font-weight:600;text-align:right;">${v}</span></div>`;
+  return `
+    <div class="modal-head" style="flex-direction:column;align-items:stretch;gap:0;position:relative;">
+      <button class="modal-close" style="position:absolute;top:14px;right:16px;" onclick="closeModal()">${ICON.x}</button>
+      <div style="text-align:center;padding:2px 40px 12px;border-bottom:1px solid var(--border);margin:-4px -24px 0;padding-left:24px;padding-right:24px;">
+        <div style="font-family:var(--font-display);font-weight:700;font-size:16.5px;color:var(--navy);">A K S Khan Healthcare Ltd.</div>
+        <div style="font-size:11px;color:var(--slate);margin-top:2px;">Rupayan Prime, Plot 02, Road 07, Dhanmondi, Dhaka-1205</div>
+      </div>
+      <h3 style="margin-top:12px;">Booking ${b.id}</h3>
+    </div>
+    <div class="modal-body">
+      <div style="margin-bottom:14px;">${statusPill(b.status)}</div>
+      ${row('Room', r.name+' &middot; '+r.floor)}
+      ${row('Date', fmtDate(b.date))}
+      ${row('Time', b.start+'&ndash;'+b.end)}
+      ${row('Employee', esc(b.empName)+' (ID '+esc(b.empIdInput)+')')}
+      ${row('Department', esc(b.deptInput))}
+      ${row('Participants', b.participants)}
+      ${row('Purpose', esc(b.purpose))}
+      ${row('Snacks', b.snacks + (b.snacksDetail?' &mdash; '+esc(b.snacksDetail):''))}
+      ${row('Lunch', b.lunch + (b.lunchDetail?' &mdash; '+esc(b.lunchDetail):''))}
+      ${row('Contact', esc(b.email)+' &middot; '+esc(b.mobile))}
+      ${b.approvedBy?row('Approved By', userById(b.approvedBy)?.dept || 'Admin'):''}
+      ${b.status==='Cancelled'?row('Cancellation reason', esc(b.cancelReason)||'&mdash;'):''}
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="downloadBooking('${b.id}')">${ICON.report} Download</button>
+      <button class="btn btn-ghost" onclick="printBooking('${b.id}')">${ICON.edit} Print</button>
+      <button class="btn btn-teal" onclick="closeModal()">Close</button>
+    </div>
+  `;
+}
+function letterheadStyle(){
+  return `body{font-family:Arial,Helvetica,sans-serif;padding:36px;color:#12213C;background:#fff;}
+    .lh-name{text-align:center;font-size:19px;font-weight:700;font-family:Georgia,'Times New Roman',serif;}
+    .lh-addr{text-align:center;color:#57667A;font-size:12.5px;margin-top:3px;margin-bottom:22px;padding-bottom:18px;border-bottom:2px solid #12213C;}
+    .lh-title{text-align:center;font-size:14px;font-weight:700;margin-bottom:14px;letter-spacing:0.04em;text-transform:uppercase;color:#57667A;}
+    .lh-status{display:block;width:fit-content;margin:0 auto 20px;padding:5px 14px;border-radius:20px;font-size:12px;font-weight:700;background:#E4F6ED;color:#1E7A50;}
+    table{width:100%;max-width:520px;margin:0 auto;border-collapse:collapse;}
+    td{padding:10px 4px;font-size:13.5px;border-bottom:1px solid #E1E7EA;}
+    td.k{color:#57667A;width:40%;} td.v{font-weight:700;text-align:right;}
+    .lh-foot{max-width:520px;margin:26px auto 0;text-align:center;font-size:10.5px;color:#8E9FB5;}`;
+}
+function bookingReceiptHTML(b){
+  const r = roomById(b.roomId);
+  const row=(k,v)=>`<tr><td class="k">${k}</td><td class="v">${v}</td></tr>`;
+  return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>Booking ${b.id}</title><style>${letterheadStyle()}</style></head><body>
+    <div class="lh-name">A K S Khan Healthcare Ltd.</div>
+    <div class="lh-addr">Rupayan Prime, Plot 02, Road 07, Dhanmondi, Dhaka-1205</div>
+    <div class="lh-title">Meeting Room Booking</div>
+    <div class="lh-status">${b.status}</div>
+    <table>
+      ${row('Booking ID', b.id)}
+      ${row('Room', r.name+' &middot; '+r.floor)}
+      ${row('Date', fmtDate(b.date))}
+      ${row('Time', b.start+'&ndash;'+b.end)}
+      ${row('Employee', esc(b.empName)+' (ID '+esc(b.empIdInput)+')')}
+      ${row('Department', esc(b.deptInput))}
+      ${row('Participants', b.participants)}
+      ${row('Purpose', esc(b.purpose))}
+      ${row('Snacks', b.snacks + (b.snacksDetail?' &mdash; '+esc(b.snacksDetail):''))}
+      ${row('Lunch', b.lunch + (b.lunchDetail?' &mdash; '+esc(b.lunchDetail):''))}
+      ${row('Contact', esc(b.email)+' &middot; '+esc(b.mobile))}
+      ${b.approvedBy?row('Approved By', esc(userById(b.approvedBy)?.dept || 'Admin')):''}
+      ${b.status==='Cancelled'?row('Cancellation reason', esc(b.cancelReason)||'&mdash;'):''}
+    </table>
+    <div class="lh-foot">Generated ${new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'long',year:'numeric'})} &middot; Meeting Room Booking Portal</div>
+  </body></html>`;
+}
+function printBooking(id){
+  const b = BOOKINGS.find(x=>x.id===id);
+  const w = window.open('', '_blank');
+  if(!w){ pushToast('Please allow pop-ups to print this booking.','error'); return; }
+  w.document.write(bookingReceiptHTML(b));
+  w.document.close();
+  setTimeout(()=>{ try{ w.focus(); w.print(); }catch(e){} }, 350);
+}
+function downloadBooking(id){
+  const b = BOOKINGS.find(x=>x.id===id);
+  const html = bookingReceiptHTML(b);
+  const blob = new Blob([html], {type:'text/html'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'Booking-'+b.id+'.html';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  setTimeout(()=>URL.revokeObjectURL(url), 2000);
+}
+
+/* ============================ CALENDAR (shared) ============================ */
+function viewCalendar(){
+  return `
+    <div class="section-title">
+      <div><div class="eyebrow">Daily view</div><h3>Room occupancy timeline</h3></div>
+      <input type="date" id="calDate" value="${state.calDate}" onchange="changeCalDate(this.value)" style="padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;"/>
+    </div>
+    <div class="card" style="padding:20px 22px;">
+      <div class="cal-wrap"><div class="cal-grid">
+        <div class="cal-axis">
+          <div></div>
+          <div class="cal-axis-hours">${HOURS.map(h=>`<span>${String(h).padStart(2,'0')}:00</span>`).join('')}</div>
+        </div>
+        ${ROOMS.map(r=>calendarRow(r)).join('')}
+      </div></div>
+      <div style="display:flex;gap:16px;margin-top:18px;flex-wrap:wrap;">
+        ${['Pending','Approved','Completed'].map(s=>`<span style="display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--slate);font-weight:600;"><span class="dot dot-${s}"></span>${s}</span>`).join('')}
+      </div>
+    </div>
+  `;
+}
+function changeCalDate(v){ state.calDate=v; renderView(); }
+function calendarRow(r){
+  const dayStart=8*60, dayEnd=20*60, span=dayEnd-dayStart;
+  const items = BOOKINGS.filter(b=>b.roomId===r.id && b.date===state.calDate && (b.status==='Approved'||b.status==='Pending'||b.status==='Completed'));
+  const colors={Pending:'#DE9F3B',Approved:'#3FA575',Completed:'#2C87A6'};
+  return `<div class="cal-row">
+    <div class="cal-room-label"><b>${r.name}</b><span>${r.floor} &middot; cap ${r.capacity}</span></div>
+    <div class="cal-track">
+      ${items.map(b=>{
+        const s=Math.max(toMin(b.start),dayStart), e=Math.min(toMin(b.end),dayEnd);
+        const left=((s-dayStart)/span*100).toFixed(2), width=((e-s)/span*100).toFixed(2);
+        return `<div class="cal-block" title="${b.start}-${b.end} ${esc(b.purpose)}" style="left:${left}%;width:${width}%;background:${colors[b.status]};">${b.start}&ndash;${b.end}</div>`;
+      }).join('')}
+    </div>
+  </div>`;
+}
+
+/* ============================ ADMIN: DASHBOARD ============================ */
+function viewDashboard(){
+  const today = BOOKINGS.filter(b=>b.date===TODAY && b.status!=='Cancelled' && b.status!=='Rejected');
+  const occupiedRoomIds = new Set(BOOKINGS.filter(b=>b.date===TODAY && (b.status==='Approved')).map(b=>b.roomId));
+  const availableRooms = ROOMS.filter(r=>r.status==='Active' && !occupiedRoomIds.has(r.id)).length;
+  const pending = BOOKINGS.filter(b=>b.status==='Pending').length;
+  const cancelled = BOOKINGS.filter(b=>b.status==='Cancelled' && b.date===TODAY).length;
+  return `
+    <div class="grid grid-4" style="margin-bottom:22px;">
+      <div class="stat-card"><div class="eyebrow">Today's Meetings</div><b>${today.length}</b><div class="delta" style="color:var(--teal);">Across ${new Set(today.map(b=>b.roomId)).size} rooms</div></div>
+      <div class="stat-card"><div class="eyebrow">Available Rooms</div><b>${availableRooms}</b><div class="delta" style="color:var(--green);">of ${ROOMS.length} total</div></div>
+      <div class="stat-card"><div class="eyebrow">Occupied Rooms</div><b>${occupiedRoomIds.size}</b><div class="delta" style="color:var(--slate);">Right now / today</div></div>
+      <div class="stat-card"><div class="eyebrow">Pending Requests</div><b>${pending}</b><div class="delta" style="color:${pending>0?'#96690F':'var(--slate)'};">Needs your review</div></div>
+    </div>
+    <div class="grid grid-2">
+      <div class="card">
+        <div class="section-title" style="padding:18px 18px 0;"><h3>Needs approval</h3><button class="btn btn-ghost btn-sm" onclick="goView('bookings')">Open queue</button></div>
+        <table><thead><tr><th>Employee</th><th>Room</th><th>Date/Time</th><th></th></tr></thead><tbody>
+          ${BOOKINGS.filter(b=>b.status==='Pending').slice(0,5).map(b=>`<tr>
+            <td>${esc(b.empName)}</td><td>${roomById(b.roomId).name}</td><td class="mono">${fmtDate(b.date)}<br>${b.start}&ndash;${b.end}</td>
+            <td style="text-align:right;white-space:nowrap;"><button class="btn btn-green btn-sm" onclick="approveBooking('${b.id}')">Approve</button> <button class="btn btn-danger btn-sm" onclick="rejectBookingPrompt('${b.id}')">Reject</button></td>
+          </tr>`).join('') || `<tr><td colspan="4" style="text-align:center;color:var(--slate);padding:26px;">Queue is clear &mdash; nothing pending.</td></tr>`}
+        </tbody></table>
+      </div>
+    </div>
+    <div class="footnote">Cancelled meetings today: <b>${cancelled}</b>. Data shown reflects requests submitted through the Employee Portal.</div>
+  `;
+}
+
+/* ============================ ADMIN: APPROVALS & BOOKINGS ============================ */
+function viewAdminBookings(){
+  const tabs = ['Pending','Approved','Rejected','Cancelled','Completed','All'];
+  const list = BOOKINGS.filter(b=> state.bookingsTab==='All' ? true : b.status===state.bookingsTab)
+    .sort((a,b)=> (a.date+a.start) < (b.date+b.start) ? 1:-1);
+  return `
+    <div class="tabs">
+      ${tabs.map(t=>`<button class="tab-btn ${state.bookingsTab===t?'active':''}" onclick="setBookingsTab('${t}')">${t} ${t!=='All'?'('+BOOKINGS.filter(b=>b.status===t).length+')':''}</button>`).join('')}
+    </div>
+    <div class="card">
+      ${list.length ? `<table><thead><tr><th>Date</th><th>Status</th><th></th></tr></thead><tbody>
+        ${list.map(b=>{
+          return `<tr>
+            <td class="mono">${fmtDate(b.date)}</td>
+            <td>${statusPill(b.status)}</td>
+            <td style="text-align:right;white-space:nowrap;">
+              <button class="btn btn-ghost btn-sm" onclick="viewBookingDetail('${b.id}')">View</button>
+              ${b.status==='Pending'?`<button class="btn btn-green btn-sm" onclick="approveBooking('${b.id}')">Approve</button><button class="btn btn-danger btn-sm" onclick="rejectBookingPrompt('${b.id}')">Reject</button>`:''}
+              ${(b.status==='Pending'||b.status==='Approved')?`<button class="btn btn-ghost btn-sm" onclick="adminCancelBooking('${b.id}')">Cancel</button>`:''}
+            </td>
+          </tr>`;
+        }).join('')}
+      </tbody></table>` : emptyState('inbox','Nothing here', 'No bookings currently match this filter.')}
+    </div>
+  `;
+}
+function setBookingsTab(t){ state.bookingsTab=t; renderView(); }
+function approveBooking(id){
+  const b = BOOKINGS.find(x=>x.id===id);
+  if(!isRoomFree(b.roomId,b.date,b.start,b.end,b.id)){ pushToast('Cannot approve — this slot now conflicts with another approved booking.','error'); return; }
+  b.status='Approved'; b.approvedBy=state.currentUser.id;
+  addNotification(b.empId, `Your booking for ${roomById(b.roomId).name} on ${fmtDate(b.date)} was approved.`, 'success');
+  pushToast('Booking approved.','success');
+  saveSharedState();
+  renderApp();
+}
+function rejectBookingPrompt(id){
+  state.rejectingId = id;
+  openModal('rejectForm');
+}
+function rejectFormModal(){
+  const b = BOOKINGS.find(x=>x.id===state.rejectingId);
+  return `
+    <div class="modal-head"><h3>Reject booking ${b.id}</h3><button class="modal-close" onclick="closeModal()">${ICON.x}</button></div>
+    <div class="modal-body">
+      <p style="font-size:13px;color:var(--slate);margin-top:0;">${esc(b.empName)} &middot; ${roomById(b.roomId).name} &middot; ${fmtDate(b.date)}, ${b.start}&ndash;${b.end}</p>
+      <div class="field"><label>Reason (shown to employee)</label><textarea id="rejReason" rows="3" style="width:100%;padding:11px 13px;border:1.5px solid var(--border);border-radius:9px;" placeholder="e.g. Room reserved for board meeting that day"></textarea></div>
+    </div>
+    <div class="modal-foot"><button class="btn btn-ghost" onclick="closeModal()">Cancel</button><button class="btn btn-danger" onclick="confirmReject()">Reject booking</button></div>
+  `;
+}
+function confirmReject(){
+  const reason = document.getElementById('rejReason').value.trim();
+  const b = BOOKINGS.find(x=>x.id===state.rejectingId);
+  b.status='Rejected'; b.cancelReason=reason || 'No reason provided'; b.approvedBy=state.currentUser.id;
+  addNotification(b.empId, `Your booking for ${roomById(b.roomId).name} on ${fmtDate(b.date)} was rejected. Reason: ${reason||'Not specified'}`, 'error');
+  pushToast('Booking rejected.','success');
+  closeModal();
+  saveSharedState();
+  renderApp();
+}
+function adminCancelBooking(id){
+  const b = BOOKINGS.find(x=>x.id===id);
+  b.status='Cancelled'; b.cancelReason='Cancelled by admin';
+  addNotification(b.empId, `Your booking for ${roomById(b.roomId).name} on ${fmtDate(b.date)} was cancelled by admin.`, 'info');
+  pushToast('Booking cancelled.','success');
+  saveSharedState();
+  renderApp();
+}
+
+/* ============================ ADMIN: ROOM MANAGEMENT ============================ */
+function viewRooms(){
+  return `
+    <div class="section-title"><h3>Meeting rooms (${ROOMS.length})</h3><button class="btn btn-teal btn-sm" onclick="openRoomForm(null)">${ICON.plus} Add room</button></div>
+    <div class="grid grid-3">
+      ${ROOMS.map(r=>`
+        <div class="card rooms-manage-card">
+          <div class="rooms-manage-top">
+            <div><b style="font-family:var(--font-display);font-size:15.5px;">${r.name}</b><div style="font-size:12px;color:var(--slate);">${r.floor}</div></div>
+            <span class="status ${r.status==='Active'?'status-Approved':'status-Cancelled'}"><span class="dot ${r.status==='Active'?'dot-avail':'dot-Cancelled'}"></span>${r.status}</span>
+          </div>
+          <div style="font-size:12.5px;color:var(--slate);">Capacity <b style="color:var(--navy);">${r.capacity}</b></div>
+          <div class="room-tags">
+            ${r.projector?'<span class="room-tag">Projector</span>':''}
+            ${r.video?'<span class="room-tag">Video Conf</span>':''}
+            ${r.whiteboard?'<span class="room-tag">Whiteboard</span>':''}
+            ${r.tea?'<span class="room-tag">Tea/Coffee</span>':''}
+          </div>
+          <div style="display:flex;gap:8px;margin-top:4px;">
+            <button class="btn btn-ghost btn-sm" style="flex:1;" onclick="openRoomForm('${r.id}')">${ICON.edit} Edit</button>
+            <button class="btn ${r.status==='Active'?'btn-danger':'btn-green'} btn-sm" style="flex:1;" onclick="toggleRoomStatus('${r.id}')">${r.status==='Active'?'Deactivate':'Activate'}</button>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+function toggleRoomStatus(id){
+  const r = roomById(id);
+  r.status = r.status==='Active' ? 'Inactive' : 'Active';
+  pushToast(`${r.name} marked ${r.status}.`,'success');
+  saveSharedState();
+  renderApp();
+}
+function openRoomForm(id){ state.editingRoomId = id; openModal('roomForm'); }
+function roomFormModal(){
+  const editing = state.editingRoomId ? roomById(state.editingRoomId) : null;
+  const r = editing || {name:'',floor:'',capacity:8,projector:false,video:false,whiteboard:false,tea:false,status:'Active'};
+  return `
+    <div class="modal-head"><h3>${editing?'Edit room':'Add a new room'}</h3><button class="modal-close" onclick="closeModal()">${ICON.x}</button></div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="field"><label>Room Name</label><input id="rmName" value="${esc(r.name)}" placeholder="e.g. Meeting Room-03"/></div>
+        <div class="field"><label>Floor / Location</label><input id="rmFloor" value="${esc(r.floor)}" placeholder="e.g. 5th Floor"/></div>
+      </div>
+      <div class="form-row">
+        <div class="field"><label>Capacity</label><input type="number" min="1" id="rmCapacity" value="${r.capacity}"/></div>
+        <div class="field"><label>Status</label><select id="rmStatus"><option ${r.status==='Active'?'selected':''}>Active</option><option ${r.status==='Inactive'?'selected':''}>Inactive</option></select></div>
+      </div>
+      <div class="field"><label>Facilities</label>
+        <div class="toggle-row">
+          <button type="button" class="toggle-btn ${r.projector?'on':''}" id="rmProjector" onclick="this.classList.toggle('on')">Projector</button>
+          <button type="button" class="toggle-btn ${r.video?'on':''}" id="rmVideo" onclick="this.classList.toggle('on')">Video Conf</button>
+          <button type="button" class="toggle-btn ${r.whiteboard?'on':''}" id="rmWhiteboard" onclick="this.classList.toggle('on')">Whiteboard</button>
+          <button type="button" class="toggle-btn ${r.tea?'on':''}" id="rmTea" onclick="this.classList.toggle('on')">Tea/Coffee</button>
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot"><button class="btn btn-ghost" onclick="closeModal()">Cancel</button><button class="btn btn-teal" onclick="saveRoom()">${editing?'Save changes':'Create room'}</button></div>
+  `;
+}
+function saveRoom(){
+  const name=document.getElementById('rmName').value.trim();
+  const floor=document.getElementById('rmFloor').value.trim();
+  const capacity=parseInt(document.getElementById('rmCapacity').value||'1',10);
+  const status=document.getElementById('rmStatus').value;
+  const projector=document.getElementById('rmProjector').classList.contains('on');
+  const video=document.getElementById('rmVideo').classList.contains('on');
+  const whiteboard=document.getElementById('rmWhiteboard').classList.contains('on');
+  const tea=document.getElementById('rmTea').classList.contains('on');
+  if(!name||!floor){ pushToast('Room name and floor are required.','error'); return; }
+  if(state.editingRoomId){
+    Object.assign(roomById(state.editingRoomId),{name,floor,capacity,status,projector,video,whiteboard,tea});
+    pushToast('Room updated.','success');
+  } else {
+    const id = 'r'+(ROOMS.length+1)+'_'+Date.now().toString(36).slice(-3);
+    ROOMS.push({id,name,floor,capacity,status,projector,video,whiteboard,tea});
+    pushToast('Room added.','success');
+  }
+  closeModal();
+  saveSharedState();
+  renderApp();
+}
+
+/* ============================ ADMIN: REPORTS ============================ */
+function viewReports(){
+  const byDept = {};
+  const byMonth = {};
+  const byStatus = {};
+  BOOKINGS.forEach(b=>{
+    const dept = b.deptInput || 'Unspecified';
+    byDept[dept] = (byDept[dept]||0)+1;
+    const month = b.date.slice(0,7);
+    byMonth[month] = (byMonth[month]||0)+1;
+    byStatus[b.status] = (byStatus[b.status]||0)+1;
+  });
+  const maxDept = Math.max(...Object.values(byDept),1);
+  const maxMonth = Math.max(...Object.values(byMonth),1);
+  const monthLabel = m => new Date(m+'-01').toLocaleDateString('en-GB',{month:'short',year:'numeric'});
+  return `
+    <div class="grid grid-2" style="margin-bottom:20px;">
+      <div class="card" style="padding:20px;">
+        <div class="section-title"><h3>Bookings by department</h3></div>
+        ${Object.entries(byDept).map(([k,v])=>`<div class="bar-row"><div class="lbl">${k}</div><div class="bar-track"><div class="bar-fill" style="width:${(v/maxDept*100).toFixed(0)}%;background:var(--teal);"></div></div><div class="val">${v}</div></div>`).join('')}
+      </div>
+      <div class="card" style="padding:20px;">
+        <div class="section-title"><h3>Bookings by month</h3></div>
+        ${Object.entries(byMonth).sort().map(([k,v])=>`<div class="bar-row"><div class="lbl">${monthLabel(k)}</div><div class="bar-track"><div class="bar-fill" style="width:${(v/maxMonth*100).toFixed(0)}%;background:var(--green);"></div></div><div class="val">${v}</div></div>`).join('')}
+      </div>
+    </div>
+    <div class="card" style="padding:20px;">
+      <div class="section-title"><h3>Status breakdown</h3></div>
+      <div class="grid grid-4">
+        ${['Pending','Approved','Rejected','Cancelled','Completed'].map(s=>`<div class="stat-card"><div class="eyebrow">${s}</div><b>${byStatus[s]||0}</b></div>`).join('')}
+      </div>
+    </div>
+    <div class="footnote">Report figures are computed live from current booking records. Export tools can be wired up to your BI stack on request.</div>
+  `;
+}
+
+/* ============================ SUPER ADMIN: USERS ============================ */
+function viewUsers(){
+  return `
+    <div class="section-title"><h3>Users &amp; Admins (${USERS.length})</h3><button class="btn btn-teal btn-sm" onclick="openModal('userForm')">${ICON.plus} Add user</button></div>
+    <div class="card">
+      <table><thead><tr><th>Name</th><th>ID</th><th>Department</th><th>Role</th><th>Contact</th></tr></thead><tbody>
+        ${USERS.map(u=>`<tr>
+          <td>${u.name}</td><td class="mono">${u.id}</td><td>${u.dept}</td>
+          <td><span class="status ${u.role==='superadmin'?'status-Rejected':(u.role==='admin'?'status-Pending':'status-Approved')}">${u.role==='superadmin'?'Super Admin':(u.role==='admin'?'Admin':'Employee')}</span></td>
+          <td style="font-size:12px;color:var(--slate);">${u.email}<br>${u.mobile}</td>
+        </tr>`).join('')}
+      </tbody></table>
+    </div>
+    <div class="footnote">As Super Admin you can create Employee, Admin, or Super Admin accounts. Approval hierarchy and escalation rules can be configured in System Settings.</div>
+  `;
+}
+function userFormModal(){
+  return `
+    <div class="modal-head"><h3>Add a user</h3><button class="modal-close" onclick="closeModal()">${ICON.x}</button></div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="field"><label>Full Name</label><input id="uName" placeholder="e.g. Tanvir Ahmed"/></div>
+        <div class="field"><label>User / Employee ID</label><input id="uId" placeholder="e.g. 1420"/></div>
+      </div>
+      <div class="form-row">
+        <div class="field"><label>Department</label><input id="uDept" placeholder="e.g. Human Resources"/></div>
+        <div class="field"><label>Role</label><select id="uRole"><option value="employee">Employee</option><option value="admin">Admin</option><option value="superadmin">Super Admin</option></select></div>
+      </div>
+      <div class="form-row">
+        <div class="field"><label>Official Email</label><input id="uEmail" placeholder="name@akskhan.com"/></div>
+        <div class="field"><label>Mobile</label><input id="uMobile" placeholder="01xxx-xxxxxx"/></div>
+      </div>
+    </div>
+    <div class="modal-foot"><button class="btn btn-ghost" onclick="closeModal()">Cancel</button><button class="btn btn-teal" onclick="saveUser()">Create user</button></div>
+  `;
+}
+function saveUser(){
+  const name=document.getElementById('uName').value.trim();
+  const id=document.getElementById('uId').value.trim();
+  const dept=document.getElementById('uDept').value.trim();
+  const role=document.getElementById('uRole').value;
+  const email=document.getElementById('uEmail').value.trim();
+  const mobile=document.getElementById('uMobile').value.trim();
+  if(!name||!id||!dept){ pushToast('Name, ID and department are required.','error'); return; }
+  if(USERS.some(u=>u.id===id)){ pushToast('A user with this ID already exists.','error'); return; }
+  USERS.push({id,name,dept,role,email,mobile});
+  pushToast('User created.','success');
+  closeModal();
+  saveSharedState();
+  renderApp();
+}
+
+/* ============================ SUPER ADMIN: SETTINGS ============================ */
+function viewSettings(){
+  return `
+    <div class="grid grid-2">
+      <div class="card" style="padding:20px;">
+        <div class="section-title"><h3>Approval hierarchy</h3></div>
+        <p style="font-size:13px;color:var(--slate);line-height:1.7;">Bookings currently route to any user with the <b>Admin</b> or <b>Super Admin</b> role. Department-level approval chains can be layered on top of this default.</p>
+        <div class="toggle-row"><button class="toggle-btn on">Single-level approval</button><button class="toggle-btn">Two-level approval</button></div>
+      </div>
+      <div class="card" style="padding:20px;">
+        <div class="section-title"><h3>Notification settings</h3></div>
+        <div class="toggle-row" style="margin-bottom:10px;"><button class="toggle-btn on">1 day before reminder</button><button class="toggle-btn on">30 min before reminder</button></div>
+        <p style="font-size:12.5px;color:var(--slate);">Employees are notified automatically when a booking is submitted, approved, rejected, cancelled or rescheduled.</p>
+      </div>
+    </div>
+    <div class="footnote">Settings shown here are illustrative controls for this prototype and are not yet persisted to a backend.</div>
+  `;
+}
+
+/* ============================ NOTIFICATIONS MODAL ============================ */
+function notificationsModal(){
+  const list = myNotifs();
+  return `
+    <div class="modal-head"><h3>Notifications</h3><button class="modal-close" onclick="closeModal()">${ICON.x}</button></div>
+    <div class="modal-body">
+      ${list.length ? list.map(n=>`
+        <div style="display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);">
+          <div class="notif-ic" style="width:30px;height:30px;border-radius:8px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:${n.type==='success'?'var(--green-pale)':(n.type==='error'?'var(--coral-pale)':'var(--teal-pale)')};color:${n.type==='success'?'var(--green)':(n.type==='error'?'var(--coral)':'var(--teal)')};">${ICON.bell}</div>
+          <div><div style="font-size:12.5px;line-height:1.5;">${n.text}</div><div style="font-size:11px;color:var(--grey-blue);margin-top:3px;">${n.time}</div></div>
+        </div>
+      `).join('') : emptyState('bell','All caught up','No notifications right now.')}
+    </div>
+    <div class="modal-foot"><button class="btn btn-ghost" onclick="closeModal()">Close</button></div>
+  `;
+}
+
+/* ============================ MODAL PLUMBING ============================ */
+function openModal(key){ state.modal = key; renderModal(); }
+function closeModal(){ state.modal = null; document.getElementById('modalRoot')?.remove(); }
+function renderModal(){
+  document.getElementById('modalRoot')?.remove();
+  if(!state.modal) return;
+  const root = document.createElement('div');
+  root.id='modalRoot';
+  root.className='modal-overlay';
+  root.onclick = (e)=>{ if(e.target===root) closeModal(); };
+  let inner = '';
+  if(state.modal==='bookingForm') inner = bookingFormModal();
+  else if(state.modal==='bookingDetail') inner = bookingDetailModal();
+  else if(state.modal==='rejectForm') inner = rejectFormModal();
+  else if(state.modal==='roomForm') inner = roomFormModal();
+  else if(state.modal==='userForm') inner = userFormModal();
+  else if(state.modal==='notifications') inner = notificationsModal();
+  root.innerHTML = `<div class="modal">${inner}</div>`;
+  document.body.appendChild(root);
+}
+
+/* ============================ BOOT ============================ */
+function renderBootScreen(){
+  document.getElementById('app').innerHTML = `
+    <div class="login-wrap">
+      <div style="text-align:center;color:#fff;">
+        <div class="login-logo-box" style="margin:0 auto 18px;"><img src="${LOGO_SRC}" alt="A K S Khan Healthcare Ltd."/></div>
+        <div style="font-size:13px;color:rgba(255,255,255,0.7);">Loading meeting room data&hellip;</div>
+      </div>
+    </div>`;
+}
+(async function boot(){
+  renderBootScreen();
+  await loadSharedState();
+  renderLogin();
+  startLiveSync();
+})();
+</script>
+</body>
+</html>
